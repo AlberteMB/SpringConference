@@ -4,6 +4,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import io.bcn.springConference.model.Conference;
 import io.bcn.springConference.repository.ConferenceRepository;
+import io.bcn.springConference.view.MainLayout;
 
 import java.awt.*;
 
