@@ -84,7 +84,7 @@ public class ConferenceView extends VerticalLayout {
 */
 
 
-@Route(value = "conferences", layout = MainLayout.class)
+@Route(value = "/conferences", layout = MainLayout.class)
 public class ConferenceView extends VerticalLayout {
     private final ConferenceRepository repository;
     private Grid<Conference> grid;
@@ -129,3 +129,4 @@ public class ConferenceView extends VerticalLayout {
         datePicker.clear();
     }
 }
+

@@ -17,7 +17,10 @@ import java.util.UUID;
 public class Speaker {
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false,
+            nullable = false)
     private UUID id;
+    @Column(name = "name",nullable = false)
     private String name;
 
     @OneToMany(mappedBy = "speakerMapped", cascade = CascadeType.ALL)
