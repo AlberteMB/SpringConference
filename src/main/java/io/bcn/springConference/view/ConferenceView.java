@@ -84,49 +84,4 @@ public class ConferenceView extends VerticalLayout {
 */
 
 
-@Route(value = "/conferences", layout = MainLayout.class)
-public class ConferenceView extends VerticalLayout {
-    private final ConferenceRepository repository;
-    private Grid<Conference> grid;
-    private TextField nameField;
-    private DatePicker datePicker;
-
-    public ConferenceView(ConferenceRepository repository) {
-        this.repository = repository;
-        createGrid();
-        createForm();
-        add(grid, createFormLayout());
-    }
-
-    private void createGrid() {
-        grid = new Grid<>(Conference.class);
-        grid.setColumns("name", "date");
-        updateList();
-    }
-
-    private void createForm() {
-        nameField = new TextField("Name");
-        datePicker = new DatePicker("Date");
-        Button saveButton = new Button("Save", e -> saveConference());
-        // Add form components and logic
-    }
-
-    private void saveConference() {
-        Conference conference = new Conference();
-        conference.setName(nameField.getValue());
-        conference.setDate(datePicker.getValue());
-        repository.save(conference);
-        updateList();
-        clearForm();
-    }
-
-    private void updateList() {
-        grid.setItems(repository.findAll());
-    }
-
-    private void clearForm() {
-        nameField.clear();
-        datePicker.clear();
-    }
-}
 
