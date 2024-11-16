@@ -25,7 +25,7 @@ public class Speaker {
     @OneToMany(mappedBy = "speakerMapped", cascade = CascadeType.ALL)
     private List<Conference> conferences;
 
-    // Getters and setters
+
 
     //method to add
     public void addConference(Conference conference) {

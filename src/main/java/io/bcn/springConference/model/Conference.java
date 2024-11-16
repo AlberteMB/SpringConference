@@ -39,6 +39,20 @@ public class Conference {
     @JoinColumn(name = "BOOK_FK_ID", nullable = false)
     private Book bookMapped;
 
+    public Book getBook() {
+        return bookMapped;
+    }
 
+    public void setBook(Book book) {
+        this.bookMapped = book;
+    }
+
+    public Speaker getSpeaker() {
+        return speakerMapped;
+    }
+
+    public void setSpeaker(Speaker speaker) {
+        this.speakerMapped = speaker;
+    }
 
 }
