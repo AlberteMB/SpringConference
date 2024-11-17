@@ -1,11 +1,22 @@
 /* Style for text betwen buttons. */
 .center-text {
     text-align: center;
-    font-size: 24px;  /* Aumenta el tamaño de la fuente */
-    font-weight: bold;  /* Opcional, para hacer el texto más destacado */
-    color: #333;  /* Color opcional para el texto */
-    margin: 20px 0;  /* Espacio arriba y abajo */
+    font-size: 24px;  /* Font size */
+    font-weight: bold;  /* Bold */
+    color: #333;  /* Color */
+    margin: 20px 0;  /* space up and down */
 }
 .move-down {
     margin-top: 36px;
+}
+
+.drawer-link {
+    font-size: 18px; /* Text size */
+    font-weight: bold; /* Bold */
+    color: #333; /* Color */
+}
+
+.avatar {
+    border-radius: 50%; /* Round */
+    border: 2px solid #ccc; /* Border */
 }
