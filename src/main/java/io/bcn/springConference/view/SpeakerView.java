@@ -5,8 +5,10 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import io.bcn.springConference.model.Speaker;
@@ -14,6 +16,7 @@ import io.bcn.springConference.repository.SpeakerRepository;
 
 import java.util.UUID;
 
+@PageTitle("Speakers")
 @Route(value = "speakers")
 public class SpeakerView extends VerticalLayout {
 
@@ -24,9 +27,11 @@ public class SpeakerView extends VerticalLayout {
     public SpeakerView(SpeakerRepository repository) {
         this.repository = repository;
         //createForm();
-        navigateConferenceView();
+
+        HorizontalLayout navigationLayout = createNavigationButtons();
+
         createGrid();
-        add(grid, createForm());
+        add(navigationLayout,grid, createForm());
     }
 
     private void createGrid() {
@@ -65,9 +70,17 @@ public class SpeakerView extends VerticalLayout {
         nameField.clear();
     }
 
-    private void navigateConferenceView(){
-        Button conferenceButton = new Button("Go to ConferenceView",
-                event -> UI.getCurrent().navigate("conferences"));
-        add(conferenceButton);
+    private HorizontalLayout createNavigationButtons() {
+        Button conferenceButton = new Button("Go to ConferenceView", event -> UI.getCurrent().navigate("conferences"));
+        Button mainLayoutButton = new Button("Go to MainLayout", event -> UI.getCurrent().navigate("mainlayout"));
+
+        // Buttons horizontally
+        HorizontalLayout navigationLayout = new HorizontalLayout(mainLayoutButton, conferenceButton);
+        // Space between them
+        navigationLayout.setSpacing(true);
+        // Vertical center
+        navigationLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+
+        return navigationLayout;
     }
 }
