@@ -8,8 +8,10 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.bcn.springConference.model.Book;
 import io.bcn.springConference.model.Conference;
 import io.bcn.springConference.model.Speaker;
@@ -32,11 +34,14 @@ public class ConferenceView extends VerticalLayout {
     private final BookRepository bookRepository;
     private final SpeakerRepository speakerRepository;
     private Grid<Conference> grid;
+    private ComboBox<Conference> conferenceComboBox;
+    private final Binder<Conference> binder = new Binder<>(Conference.class);
+    private ComboBox<Conference> updateConferenceComboBox;
+    private Button updateButton;
     private TextField nameField;
     private DatePicker datePicker;
     private ComboBox<Book> bookComboBox;
     private ComboBox<Speaker> speakerComboBox;
-    private ComboBox<Conference> conferenceComboBox;
 
 
     public ConferenceView(ConferenceRepository conferenceRepository,BookRepository bookRepository,
@@ -45,7 +50,6 @@ public class ConferenceView extends VerticalLayout {
         this.bookRepository = bookRepository;
         this.speakerRepository = speakerRepository;
 
-
         // Full size and center
         setSizeFull();
         setAlignItems(Alignment.START);
@@ -53,7 +57,8 @@ public class ConferenceView extends VerticalLayout {
         // Navigation buttons
         HorizontalLayout navigationLayout = createNavigationButtons();
 
-        Component form = createForm();
+        Component createForm = createForm();
+        Component updateForm = createUpdateForm();
         createGrid();
         // Layout
         VerticalLayout gridLayout = new VerticalLayout(grid);
@@ -61,7 +66,7 @@ public class ConferenceView extends VerticalLayout {
         gridLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         // Adding components
-        add(navigationLayout, form, gridLayout);
+        add(navigationLayout, createForm, updateForm, gridLayout);
         // Grid take up the remaining space
         expand(gridLayout);
 
@@ -90,50 +95,82 @@ public class ConferenceView extends VerticalLayout {
         speakerComboBox.setItemLabelGenerator(Speaker::getName);
         speakerComboBox.setItems(speakerRepository.findAll());
         // ComboBox with conferences
-        conferenceComboBox = new ComboBox<>("Conferences");
+        conferenceComboBox = new ComboBox<>("Select to delete");
         conferenceComboBox.setItemLabelGenerator(Conference::getName);
         conferenceComboBox.setItems(conferenceRepository.findAll());
 
-
+//        Label createLabel = new Label("Create Conference");
+//        createLabel.addClassName("center-text");
 
         // Save
         Button saveButton = new Button("Save", event -> saveConference());
         // Delete
         Button deleteButton = new Button("Delete", event -> deleteConference());
 
-        // Add form components name date in horizontal
-        HorizontalLayout nameDateLayout = new HorizontalLayout(nameField,datePicker);
+        // Bind fields to the Conference class
+        binder.forField(nameField)
+                .asRequired("Name is required")
+                .bind(Conference::getName, Conference::setName);
+
+        binder.forField(datePicker)
+                .asRequired("Date is required")
+                .bind(Conference::getDate, Conference::setDate);
+
+        binder.forField(bookComboBox)
+                .asRequired("Book selection is required")
+                .bind(Conference::getBook, Conference::setBook);
+
+        binder.forField(speakerComboBox)
+                .asRequired("Speaker selection is required")
+                .bind(Conference::getSpeaker, Conference::setSpeaker);
+
+
+        // Add form components name date bookComboBox
+        HorizontalLayout nameDateLayout = new HorizontalLayout(nameField, datePicker,bookComboBox );
         nameDateLayout.setSpacing(true);
         nameDateLayout.setPadding(true);
         nameDateLayout.setDefaultVerticalComponentAlignment(Alignment.START);
-        // Add form components bookComboBox and speakerComboBox
-        HorizontalLayout bookSpeakerLayout = new HorizontalLayout(bookComboBox, speakerComboBox);
+        // Add form components speakerComboBox and saveButton
+        HorizontalLayout bookSpeakerLayout = new HorizontalLayout(speakerComboBox,saveButton);
+        saveButton.addClassName("move-down");
         bookSpeakerLayout.setSpacing(true);
         bookSpeakerLayout.setPadding(true);
         bookSpeakerLayout.setDefaultVerticalComponentAlignment(Alignment.START);
 
-        //Add form components saveButton conferenceComboBox and deleteButton
-        VerticalLayout conferenceSaveDeleteLayout = new VerticalLayout(saveButton,conferenceComboBox, deleteButton);
+        //Add form components conferenceComboBox and deleteButton
+        HorizontalLayout conferenceSaveDeleteLayout = new HorizontalLayout(conferenceComboBox, deleteButton);
+        deleteButton.addClassName("move-down");
         conferenceSaveDeleteLayout.setSpacing(true);
         conferenceSaveDeleteLayout.setPadding(true);
-        conferenceSaveDeleteLayout.setDefaultHorizontalComponentAlignment(Alignment.START);
+        conferenceSaveDeleteLayout.setDefaultVerticalComponentAlignment(Alignment.START);
 
-        VerticalLayout formLayout = new VerticalLayout(nameDateLayout,bookSpeakerLayout, conferenceSaveDeleteLayout);
 
-        return formLayout;
+
+        return new VerticalLayout(nameDateLayout,bookSpeakerLayout, conferenceSaveDeleteLayout);
     }
 
     private void saveConference() {
         Conference conference = new Conference();
-        conference.setName(nameField.getValue());
-        conference.setDate(datePicker.getValue());
-        conference.setBook(bookComboBox.getValue());
-        conference.setSpeaker(speakerComboBox.getValue());
-        conferenceRepository.save(conference);
-        // Update list and ComboBox
-        updateList();
-        updateConferenceComboBox();
-        clearForm();
+
+        if (binder.writeBeanIfValid(conference))  {
+            conferenceRepository.save(conference);
+            updateConferenceComboBox();
+            updateList();
+            clearForm();
+        } else {
+            binder.validate();
+            Notification.show("Please fill in all required fields", 3000, Notification.Position.MIDDLE);
+        }
+
+//        conference.setName(nameField.getValue());
+//        conference.setDate(datePicker.getValue());
+//        conference.setBook(bookComboBox.getValue());
+//        conference.setSpeaker(speakerComboBox.getValue());
+//        conferenceRepository.save(conference);
+//        // Update list and ComboBox
+//        updateList();
+//        updateConferenceComboBox();
+//        clearForm();
     }
 
     private void updateList() {
@@ -141,17 +178,18 @@ public class ConferenceView extends VerticalLayout {
         // Updating manually just in case
         grid.getDataProvider().refreshAll();
 
-        List<Conference> conferences = conferenceRepository.findAll();
-        System.out.println("Conferences in DB: " + conferences.size());
-        for (Conference c : conferences) {
-            System.out.println("Conference: " + c.getName() + " - " + c.getDate());
-        }
-        grid.setItems(conferences);
+        binder.readBean(new Conference());
+
+//        List<Conference> conferences = conferenceRepository.findAll();
+//        System.out.println("Conferences in DB: " + conferences.size());
+//        for (Conference c : conferences) {
+//            System.out.println("Conference: " + c.getName() + " - " + c.getDate());
+//        }
+//        grid.setItems(conferences);
     }
 
     private void clearForm() {
-        nameField.clear();
-        datePicker.clear();
+        binder.readBean(null);
     }
 
 
@@ -190,6 +228,88 @@ public class ConferenceView extends VerticalLayout {
 
     private void updateConferenceComboBox() {
         conferenceComboBox.setItems(conferenceRepository.findAll());
+    }
+
+    private Component createUpdateForm() {
+        updateConferenceComboBox = new ComboBox<>("Select Conference");
+        updateConferenceComboBox.setItems(conferenceRepository.findAll());
+        updateConferenceComboBox.setItemLabelGenerator(Conference::getName);
+
+        // Add listeners to load selected conference details
+        updateConferenceComboBox.addValueChangeListener(event -> {
+            Conference selectedConference = event.getValue();
+            if (selectedConference != null) {
+                loadConferenceDetails(selectedConference);
+            } else {
+                clearUpdateFields();
+            }
+        });
+
+        // Fields to update
+        TextField updateNameField = new TextField("Name");
+        DatePicker updateDatePicker = new DatePicker("Date");
+        ComboBox<Book> updateBookComboBox = new ComboBox<>("Book");
+        updateBookComboBox.setItemLabelGenerator(Book::getTitle);
+        updateBookComboBox.setItems(bookRepository.findAll());
+
+        ComboBox<Speaker> updateSpeakerComboBox = new ComboBox<>("Speaker");
+        updateSpeakerComboBox.setItemLabelGenerator(Speaker::getName);
+        updateSpeakerComboBox.setItems(speakerRepository.findAll());
+
+        // Update button
+        updateButton = new Button("Update", event -> {
+            Conference selectedConference = updateConferenceComboBox.getValue();
+            if (selectedConference != null) {
+                updateConference(selectedConference, updateNameField, updateDatePicker, updateBookComboBox, updateSpeakerComboBox);
+            } else {
+                Notification.show("No conference selected!", 3000, Notification.Position.MIDDLE);
+            }
+        });
+
+        // Layout
+        HorizontalLayout selectNameDateLayout = new HorizontalLayout(updateConferenceComboBox, updateNameField, updateDatePicker);
+        updateButton.addClassName("move-down");
+        selectNameDateLayout.setSpacing(true);
+        selectNameDateLayout.setPadding(true);
+        selectNameDateLayout.setDefaultVerticalComponentAlignment(Alignment.START);
+
+        HorizontalLayout bookSpeakerButtonLayout = new HorizontalLayout(updateBookComboBox, updateSpeakerComboBox, updateButton);
+        bookSpeakerButtonLayout.setSpacing(true);
+        bookSpeakerButtonLayout.setPadding(true);
+        bookSpeakerButtonLayout.setDefaultVerticalComponentAlignment(Alignment.START);
+        VerticalLayout twoLinesLayout = new VerticalLayout(selectNameDateLayout, bookSpeakerButtonLayout);
+        twoLinesLayout.setSpacing(true);
+        twoLinesLayout.setPadding(true);
+
+        return twoLinesLayout;
+    }
+
+    private void loadConferenceDetails(Conference conference) {
+        nameField.setValue(conference.getName() != null ? conference.getName() : "");
+        datePicker.setValue(conference.getDate());
+        bookComboBox.setValue(conference.getBook());
+        speakerComboBox.setValue(conference.getSpeaker());
+    }
+
+    private void updateConference(Conference conference, TextField updateNameField, DatePicker updateDatePicker, ComboBox<Book> updateBookComboBox, ComboBox<Speaker> updateSpeakerComboBox) {
+        conference.setName(updateNameField.getValue());
+        conference.setDate(updateDatePicker.getValue());
+        conference.setBook(updateBookComboBox.getValue());
+        conference.setSpeaker(updateSpeakerComboBox.getValue());
+
+        conferenceRepository.save(conference);
+        Notification.show("Conference updated successfully!", 3000, Notification.Position.MIDDLE);
+
+        updateConferenceComboBox.setItems(conferenceRepository.findAll()); // Refresh the ComboBox
+        updateList(); // Refresh the grid
+        clearUpdateFields();
+    }
+
+    private void clearUpdateFields() {
+        nameField.clear();
+        datePicker.clear();
+        bookComboBox.clear();
+        speakerComboBox.clear();
     }
 }
 
