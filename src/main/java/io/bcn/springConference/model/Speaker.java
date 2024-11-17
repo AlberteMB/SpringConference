@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Speaker {
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+   //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false,
             nullable = false)
     private UUID id;

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +22,9 @@ public class Conference {
     @Id
     @Column(name = "id", updatable = false,
             nullable = false)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
     @Column(name = "conference_name",nullable = false)
@@ -30,12 +34,12 @@ public class Conference {
     private LocalDate date;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "SPEAKER_FK_ID", nullable = false)
     private Speaker speakerMapped;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "BOOK_FK_ID", nullable = false)
     private Book bookMapped;
 

@@ -17,9 +17,9 @@ import java.util.UUID;
 public class Book {
 
     @Id
-//    @GeneratedValue(generator = "UUID")
-//    @GenericGenerator(name = "UUID",
-//            strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", updatable = false,
             nullable = false)
     private UUID id;
