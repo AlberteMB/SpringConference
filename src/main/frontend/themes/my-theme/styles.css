@@ -1,0 +1,11 @@
+/* Style for text betwen buttons. */
+.center-text {
+    text-align: center;
+    font-size: 24px;  /* Aumenta el tamaño de la fuente */
+    font-weight: bold;  /* Opcional, para hacer el texto más destacado */
+    color: #333;  /* Color opcional para el texto */
+    margin: 20px 0;  /* Espacio arriba y abajo */
+}
+.move-down {
+    margin-top: 36px;
+}

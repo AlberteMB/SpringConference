@@ -72,7 +72,7 @@ public class SpeakerView extends VerticalLayout {
 
     private HorizontalLayout createNavigationButtons() {
         Button conferenceButton = new Button("Go to ConferenceView", event -> UI.getCurrent().navigate("conferences"));
-        Button mainLayoutButton = new Button("Go to MainLayout", event -> UI.getCurrent().navigate("mainlayout"));
+        Button mainLayoutButton = new Button("Go to MainLayout", event -> UI.getCurrent().navigate(""));
 
         // Buttons horizontally
         HorizontalLayout navigationLayout = new HorizontalLayout(mainLayoutButton, conferenceButton);
