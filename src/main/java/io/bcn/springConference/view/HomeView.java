@@ -1,18 +1,13 @@
-package io.bcn.springConference.views;
+package io.bcn.springConference.view;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
-import io.bcn.springConference.view.ConferenceView;
-import io.bcn.springConference.view.SpeakerView;
-
-import javax.swing.*;
 
 @PageTitle("Main Layout")
 @Route("")
